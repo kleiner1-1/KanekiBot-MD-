@@ -65,7 +65,7 @@ const fkontak = {
   const mention = [m.sender, creatorNumber + '@s.whatsapp.net'];
 
   try {
-    const imageURL = "https://raw.githubusercontent.com/Kone457/Nexus/refs/heads/main/Kaneki.png";
+    const imageURL = "https://tmpfiles.org/dl/10031567/1754941241204.png";
     const imgBuffer = await got(imageURL).buffer();
 
     await conn.sendMessage(
