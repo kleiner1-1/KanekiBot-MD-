@@ -65,7 +65,7 @@ const fkontak = {
   const mention = [m.sender, creatorNumber + '@s.whatsapp.net'];
 
   try {
-    const imageURL = "https://tmpfiles.org/dl/10031567/1754941241204.png";
+    const imageURL = "https://files.catbox.moe/nisgky.jpg";
     const imgBuffer = await got(imageURL).buffer();
 
     await conn.sendMessage(
