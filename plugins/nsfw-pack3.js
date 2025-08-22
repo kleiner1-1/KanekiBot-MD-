@@ -1,48 +1,40 @@
-const axios = import("axios");
-const fs = import("fs");
+import axios from "axios";
+import fs from "fs";
 
-const handler = async (msg, { conn }) => {
-  const chatId = msg.key.remoteJid;
+let handler = async (m, { conn, usedPrefix, command }) => {
+  let chatId = m.chat;
 
-  const activos = fs.existsSync('./activos.json')
+  let activos = fs.existsSync('./activos.json')
     ? JSON.parse(fs.readFileSync('./activos.json', 'utf-8'))
     : {};
 
-  if (!activos.modocaliente || !activos.modocaliente[chatId]) {
-    await conn.sendMessage(chatId, {
-      text: "🔞 El *modo caliente* está desactivado en este grupo.\nActívalo con: *.modocaliente on*"
-    }, { quoted: msg });
-    return;
-  }
-
   try {
-    const res = await axios.get("https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json");
-    const data = res.data;
-    const url = data[Math.floor(Math.random() * data.length)];
+    let res = await axios.get("https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json");
+    let data = res.data;
+    let url = data[Math.floor(Math.random() * data.length)];
 
-    await conn.sendMessage(chatId, {
+    await conn.sendMessage(m.chat, {
       image: { url },
       caption: "🔥 Aquí tienes un *pack* 🔞",
       footer: '𝖯𝗋𝖾𝖼𝗂𝗈𝗇𝖺 𝖾𝗅 𝖻𝗈𝗍𝗈́𝗇 𝗉𝖺𝗋𝖺 𝗅𝖺 𝗌𝗂𝗀𝗎𝗂𝖾𝗇𝗍𝖾 𝗂𝗆𝖺𝗀𝖾𝗇',
       buttons: [
         {
-          buttonId: '.pack',
+          buttonId: `${usedPrefix + command}`,
           buttonText: { displayText: '𝖲𝗂𝗀𝗎𝗂𝖾𝗇𝗍𝖾' },
           type: 1
         }
       ]
-    }, { quoted: msg });
+    }, { quoted: m });
 
   } catch (e) {
     console.error("❌ Error en .pack:", e);
-    await conn.sendMessage(chatId, {
-      text: "❌ No se pudo obtener el contenido."
-    }, { quoted: msg });
+    await conn.reply(m.chat, "❌ No se pudo obtener el contenido.", m);
   }
 };
 
-handler.command = ["pack3"];
+handler.command = ["pack2"];
 handler.tags = ["nsfw"];
-handler.help = ["pack"];
+handler.help = ["pack2"];
+handler.register = false; 
 
-export default handler
+export default handler;
