@@ -19,10 +19,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
         await conn.sendMessage(m.chat, {
             image: res.data,
-            caption: `╔══════════════════════╗
-║ Aquí tienes amigo    ║
-║ No te la jales       ║
-╚══════════════════════╝`,
+            caption: `Aqui tienes amigo.\n No te la jales,cómo Barboza.😉 `,
         }, { quoted: m });
 
         m.react("✅");
