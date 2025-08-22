@@ -12,6 +12,7 @@ global.owner = [
   ['111270153982054@lid', "lid bajo", true],
   ['584146277368', "Barboza Mod", true],
   ['5355699866', "Carlos", true],
+  ['573113406369@s.whatsapp.net', "Bajo", true],
 ] 
 
 global.mods = [] 
