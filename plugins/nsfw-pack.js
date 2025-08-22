@@ -1,58 +1,46 @@
+import fetch from 'node-fetch';
 import axios from 'axios';
 
-let handler = async (m, { conn, usedPrefix, command }) => {
-    // ⚠️ Se agregó la verificación de seguridad para NSFW.
-    if (m.isGroup) {
-        let isnsfw = global.db.data.chats[m.chat].isnsfw;
-        if (!isnsfw) {
-            return m.reply(`🚫 El comando ${usedPrefix + command} solo puede ser usado si el modo NSFW está activado en este grupo. \n\nPuedes activarlo con: ${usedPrefix}enable nsfw`);
-        }
-    } else {
-        return m.reply('🚫 Este comando solo se puede usar en grupos.');
-    }
+let handler = async (m, { conn, text, usedPrefix, command}) => {
+  m.react('🕑');
 
-    m.react("🔞");
+  let txt = 'Pack🔥🔥🔥\n> Pon De Nuevo.pack para mirar el siguiente ✨';
+  let img = 'https://delirius-apiofc.vercel.app/nsfw/girls';
 
-    try {
-        const apiUrl = `https://delirius-apiofc.vercel.app/nsfw/girls`;
-        const res = await axios.get(apiUrl, { responseType: 'arraybuffer' });
-        
-        if (!res.data) {
-            m.react("❌");
-            return m.reply(`⚠️ La API no devolvió datos de imagen válidos.`);
-        }
+  const textRandom = [
+    "𝙀𝙩𝙞𝙦𝙪𝙚𝙩𝙖 𝙂𝙚𝙣𝙚𝙧𝙖𝙡 𝙓 *Sasuke*",
+    "𝙈𝙚𝙣𝙘𝙞𝙤𝙣 𝙂𝙚𝙣𝙚𝙧𝙖𝙡",
+    "𝙀𝙩𝙞𝙦𝙪𝙚𝙩𝙖𝙣𝙙𝙤 𝙖 𝙡𝙤𝙨 𝙉𝙋𝘾"
+  ];
 
-        await conn.sendMessage(m.chat, {
-            image: res.data,
-            caption: `Disfruta 🥵`,
-        }, { quoted: m });
+  const imgRandom = [
+    "https://iili.io/FKVDVAN.jpg",
+    "https://iili.io/FKVbUrJ.jpg"
+  ];
 
-        m.react("✅");
+  const msjRandom = textRandom[Math.floor(Math.random() * textRandom.length)];
+  const imgSelected = imgRandom[Math.floor(Math.random() * imgRandom.length)];
+  const thumb = Buffer.from((await axios.get(imgSelected, { responseType: 'arraybuffer'})).data);
 
-    } catch (e) {
-        m.react("❌");
-        let mensaje = "Ocurrió un error inesperado al procesar tu solicitud.";
-        let tipo = "Error desconocido";
-
-        if (e.response) {
-            tipo = `Error HTTP ${e.response.status}`;
-            mensaje = `La API respondió con un error: ${e.response.statusText}.`;
-        } else if (e.request) {
-            tipo = "Error de conexión";
-            mensaje = "No se pudo conectar con el servidor de la API. Revisa tu conexión a internet.";
-        } else {
-            tipo = e.name || "Error inesperado";
-            mensaje = e.message || "Ocurrió un problema. Intenta de nuevo.";
-        }
-        
-        await conn.reply(m.chat, `💥 Error: ${mensaje}\nTipo: ${tipo}`, m);
-        console.error(`[NSFW] Error capturado: ${tipo} → ${e.message}`);
-    }
+  const izumi = {
+    key: { participants: "0@s.whatsapp.net", fromMe: false, id: "Halo"},
+    message: {
+      locationMessage: {
+        name: msjRandom,
+        jpegThumbnail: thumb,
+        vcard:
+          "BEGIN:VCARD\nVERSION:3.0\nN:;Unlimited;;;\nFN:Unlimited\nORG:Unlimited\nTITLE:\n" +
+          "item1.TEL;waid=19709001746:+1 (970) 900-1746\nitem1.X-ABLabel:Unlimited\n" +
+          "X-WA-BIZ-DESCRIPTION:ofc\nX-WA-BIZ-NAME:Unlimited\nEND:VCARD"
+}
+},
+    participant: "0@s.whatsapp.net"
 };
 
-handler.help = ['pack'];
-handler.command = ['girls','pack'];
-handler.tags = ['nsfw'];
-handler.group = true;
+  m.react('✅');
+  conn.sendMessage(m.chat, { image: { url: img}, caption: txt}, { quoted: izumi});
+};
+
+handler.command = ['pack'];
 
 export default handler;
