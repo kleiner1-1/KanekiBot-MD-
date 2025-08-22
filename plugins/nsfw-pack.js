@@ -3,8 +3,8 @@ import axios from 'axios';
 let handler = async (m, { conn, usedPrefix, command }) => {
     // ⚠️ Se agregó la verificación de seguridad para NSFW.
     if (m.isGroup) {
-        let isNsfw = global.db.data.chats[m.chat].isNsfw;
-        if (!isNsfw) {
+        let isnsfw = global.db.data.chats[m.chat].isnsfw;
+        if (!isnsfw) {
             return m.reply(`🚫 El comando ${usedPrefix + command} solo puede ser usado si el modo NSFW está activado en este grupo. \n\nPuedes activarlo con: ${usedPrefix}enable nsfw`);
         }
     } else {
