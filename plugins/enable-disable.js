@@ -1,13 +1,13 @@
 let handler = async (m, { conn, args, usedPrefix, command }) => {
     let chat = global.db.data.chats[m.chat];
     
-    if (args[0] === 'enable') {
+    if (args[0] === 'on') {
         if (chat.nsfw) {
             return m.reply(`⚠️ El modo NSFW ya está activado.`);
         }
         chat.nsfw = true;
         m.reply(`✅ El modo NSFW se ha activado correctamente.`);
-    } else if (args[0] === 'disable') {
+    } else if (args[0] === 'off') {
         if (!chat.nsfw) {
             return m.reply(`⚠️ El modo NSFW ya está desactivado.`);
         }
@@ -17,13 +17,13 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         return m.reply(`
 *Uso incorrecto del comando*
 Por favor, usa:
-*${usedPrefix + command} enable* para activar
-*${usedPrefix + command} disable* para desactivar
+*${usedPrefix + command} on* para activar
+*${usedPrefix + command} off* para desactivar
         `);
     }
 }
 
-handler.help = ['enable nsfw', 'disable nsfw'];
+handler.help = ['nsfw on', 'nsfw off'];
 handler.tags = ['group'];
 handler.command = 'nsfw';
 handler.group = true;
