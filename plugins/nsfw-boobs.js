@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 let handler = async (m, { conn, usedPrefix, command }) => {
-    // 🔞 Se eliminó la verificación NSFW para permitir ejecución directa en grupos.
+    
     if (!m.isGroup) {
         return m.reply('🚫 Este comando solo se puede usar en grupos.');
     }
