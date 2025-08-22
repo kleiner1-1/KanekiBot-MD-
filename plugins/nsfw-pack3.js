@@ -13,7 +13,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     await conn.sendMessage(m.chat, {
       image: { url },
-      caption: `🔥 Aquí tienes un *pack ritualizado* 🔞\n\nNo te la jales.`
+      caption: `🔥 Aquí tienes un *pack* 🔞\n\nNo te la jales.`
     }, { quoted: m });
 
     m.react("✅");
