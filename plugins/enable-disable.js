@@ -25,7 +25,7 @@ Por favor, usa:
 
 handler.help = ['enable nsfw', 'disable nsfw'];
 handler.tags = ['group'];
-handler.command = ['enable', 'disable'];
+handler.command = 'nsfw';
 handler.group = true;
 handler.admin = true;
 
