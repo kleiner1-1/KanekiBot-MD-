@@ -48,6 +48,6 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 handler.help = ['boobs'];
 handler.command = ['boobs','tetas'];
 handler.tags = ['nsfw'];
-handler.group = true; // Se mantiene la restricción grupal.
+handler.group = true; 
 
 export default handler;
