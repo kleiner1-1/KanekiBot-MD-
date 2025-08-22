@@ -1,48 +1,48 @@
-import axios from "axios";
-import fs from "fs";
+const axios = import("axios");
+const fs = import("fs");
 
-let handler = async (m, { conn, usedPrefix, command }) => {
-  let chatId = m.chat;
+const handler = async (msg, { conn }) => {
+  const chatId = msg.key.remoteJid;
 
-  
-  let activos = fs.existsSync('./activos.json')
+  const activos = fs.existsSync('./activos.json')
     ? JSON.parse(fs.readFileSync('./activos.json', 'utf-8'))
     : {};
 
-  
   if (!activos.modocaliente || !activos.modocaliente[chatId]) {
-    return conn.reply(m.chat, `🔞 El *modo caliente* está desactivado en este grupo.\n\nActívalo con: *${usedPrefix}modocaliente on*`, m);
+    await conn.sendMessage(chatId, {
+      text: "🔞 El *modo caliente* está desactivado en este grupo.\nActívalo con: *.modocaliente on*"
+    }, { quoted: msg });
+    return;
   }
 
   try {
-    
-    let res = await axios.get("https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json");
-    let data = res.data;
-    let url = data[Math.floor(Math.random() * data.length)];
+    const res = await axios.get("https://raw.githubusercontent.com/BrunoSobrino/TheMystic-Bot-MD/master/src/JSON/booty.json");
+    const data = res.data;
+    const url = data[Math.floor(Math.random() * data.length)];
 
-    
-    await conn.sendMessage(m.chat, {
+    await conn.sendMessage(chatId, {
       image: { url },
       caption: "🔥 Aquí tienes un *pack* 🔞",
       footer: '𝖯𝗋𝖾𝖼𝗂𝗈𝗇𝖺 𝖾𝗅 𝖻𝗈𝗍𝗈́𝗇 𝗉𝖺𝗋𝖺 𝗅𝖺 𝗌𝗂𝗀𝗎𝗂𝖾𝗇𝗍𝖾 𝗂𝗆𝖺𝗀𝖾𝗇',
       buttons: [
         {
-          buttonId: `${usedPrefix + command}`,
+          buttonId: '.pack',
           buttonText: { displayText: '𝖲𝗂𝗀𝗎𝗂𝖾𝗇𝗍𝖾' },
           type: 1
         }
       ]
-    }, { quoted: m });
+    }, { quoted: msg });
 
   } catch (e) {
     console.error("❌ Error en .pack:", e);
-    await conn.reply(m.chat, "❌ No se pudo obtener el contenido.", m);
+    await conn.sendMessage(chatId, {
+      text: "❌ No se pudo obtener el contenido."
+    }, { quoted: msg });
   }
 };
 
 handler.command = ["pack2"];
 handler.tags = ["nsfw"];
 handler.help = ["pack2"];
-handler.register = false; 
 
-export default handler;
+export default handler
