@@ -13,16 +13,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     await conn.sendMessage(m.chat, {
       image: { url },
-      caption: `🔥 Aquí tienes un *pack* 🔞\n\n𝖯𝗋𝖾𝖼𝗂𝗈𝗇𝖺 𝖾𝗅 𝖻𝗈𝗍𝗈́𝗇 𝗉𝖺𝗋𝖺 𝗅𝖺 𝗌𝗂𝗀𝗎𝗂𝖾𝗇𝗍𝖾 𝗂𝗆𝖺𝗀𝖾𝗇`,
-      buttons: [
-        {
-          buttonId: `${usedPrefix + command}`,
-          buttonText: { displayText: '😏 𝖲𝗂𝗀𝗎𝗂𝖾𝗇𝗍𝖾 Pack' },
-          type: 1
-        }
-      ],
-      footer: '🕯️ Ritual NSFW por DeliriusBot',
-      headerType: 4
+      caption: `🔥 Aquí tienes un *pack ritualizado* 🔞\n\nNo te la jales.`
     }, { quoted: m });
 
     m.react("✅");
@@ -30,7 +21,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   } catch (e) {
     m.react("❌");
     console.error("❌ Error en pack5:", e);
-    await conn.reply(m.chat, "💥 No se pudo invocar el pack . El altar digital falló.", m);
+    await conn.reply(m.chat, "💥 El altar falló. No se pudo invocar el pack.", m);
   }
 };
 
