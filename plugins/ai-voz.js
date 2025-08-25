@@ -1,61 +1,63 @@
 import fetch from 'node-fetch';
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-  const thumbnailCard = 'https://files.catbox.moe/1xq0zj.jpg'; // Imagen ceremonial
+const KANEKI_API = 'https://myapiadonix.vercel.app/api/adonixvoz?q=';
 
-  if (!text) {
-    return conn.sendMessage(m.chat, {
-      text: `🗣️ *Escribe el texto que deseas convertir en voz ceremonial.*\n\n📌 *Ejemplo:* ${usedPrefix + command} Hoy el grupo se reúne en complicidad sonora.`,
-      footer: '🔊 Kaneki-Bot - Voz ritual en acto',
-      contextInfo: {
-        externalAdReply: {
-          title: 'KanekiBot 🔊',
-          body: 'Convierte palabras en presencia sonora',
-          thumbnailUrl: thumbnailCard,
-          sourceUrl: 'https://myapiadonix.vercel.app'
-        }
-      }
-    }, { quoted: m });
+async function fetchKanekiVoice(phrase) {
+  try {
+    const res = await fetch(KANEKI_API + encodeURIComponent(phrase));
+    if (!res.ok) return null;
+    const buffer = await res.buffer();
+    return buffer;
+  } catch (e) {
+    console.log('❌ Error al invocar la voz de Kaneki:', e);
+    return null;
   }
+}
+
+let handler = async (m, { text, conn, command }) => {
+  if (!text) return m.reply(`
+╭━━━〔 *KANEKI TE ESCUCHA...* 〕━━━
+┃🗣️ *Por favor, escribe lo que deseas que diga.*
+┃💡 *Ejemplo:* ${command} El ritual comienza ahora.
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━
+`.trim());
 
   try {
-    const audioUrl = `https://myapiadonix.vercel.app/api/adonixvoz?q=${encodeURIComponent(text)}`;
-    const audioRes = await fetch(audioUrl);
-    const audioBuffer = await audioRes.buffer();
+    await m.reply('🎙️ *Kaneki está canalizando su voz...* 🕯️');
+
+    const audio = await fetchKanekiVoice(text);
+    if (!audio) return m.reply('❌ *No se pudo generar el audio.* Intenta con otra frase o más tarde.');
 
     const caption = `
-╭━━━〔 *KANEKI-BOT - VOZ RITUAL 🔊* 〕━━━
-┃📝 *Texto invocado:* ${text}
-┃🎙️ *Estado:* Voz generada con éxito
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔊 *Enviando audio ceremonial...*
+╭━━━〔 *VOZ DE KANEKI 🔊* 〕━━━
+┃📝 *Frase invocada:* ${text}
+┃🎧 *Estilo:* KanekiBot ceremonial
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ Tu frase se convirtió en presencia sonora...
 `.trim();
 
     await conn.sendMessage(m.chat, {
-      image: { url: thumbnailCard },
-      caption,
-      footer: '🎧 Voz generada por KanekiBot',
-      contextInfo: {
-        externalAdReply: {
-          title: 'Escucha tu voz ritual',
-          body: 'Haz clic para reproducir o compartir',
-          thumbnailUrl: thumbnailCard,
-          sourceUrl: audioUrl
-        }
-      }
+      audio,
+      mimetype: 'audio/mp4',
+      ptt: true,
+      caption
     }, { quoted: m });
 
-    await conn.sendMessage(m.chat, {
-      audio: audioBuffer,
-      mimetype: 'audio/mpeg',
-      fileName: `voz_kaneki.mp3`
-    }, { quoted: m });
+  } catch (e) {
+    console.error('💥 Error general en el flujo de voz Kaneki:', e);
+    m.reply(`
+🚫 *Kaneki se quedó sin voz temporalmente*
 
-  } catch (err) {
-    console.error('❌ Error:', err);
-    m.reply(`💥 *Ocurrió un error al procesar tu solicitud.*\n📛 ${err.message}`);
+╭━━━〔 *DETALLES DEL SILENCIO* 〕━━━
+┃📄 *Error:* ${e.message}
+┃🔁 *Sugerencia:* Intenta más tarde o cambia la frase
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━
+🕯️ *La voz siempre regresa cuando el grupo la necesita...*
+`.trim());
   }
 };
 
-handler.command = ['voz', 'vozritual', 'hablakaneki'];
+handler.command = ['voz', 'kaneki', 'hablakaneki', 'vozceremonial'];
+handler.help = ['voz <frase>'];
+handler.tags = ['voz', 'kaneki'];
 export default handler;
