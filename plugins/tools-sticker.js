@@ -50,17 +50,7 @@ let handler = async (m, { conn, args }) => {
   } finally {
     if (stiker) {
       await conn.sendMessage(m.chat, {
-        text: '🎁 Tu sticker está listo 🎉',
-        footer: '✨ Generado con estilo personalizado',
-        contextInfo: {
-          externalAdReply: {
-            title: 'Sticker convertido',
-            body: 'Vista previa de la imagen base',
-            thumbnailUrl: thumbnailCard,
-            sourceUrl: args[0] || thumbnailCard
-          }
-        }
-      }, { quoted: m })
+        
 
       await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
     } else {
