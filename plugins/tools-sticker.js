@@ -65,7 +65,7 @@ let handler = async (m, { conn, args }) => {
       await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
     } else {
       await conn.sendMessage(m.chat, {
-        text: 💯 𝐑𝐞𝐬𝐩𝐨𝐧𝐝𝐞 𝐚 𝐮𝐧𝐚 *𝐢𝐦𝐚𝐠𝐞𝐧/𝐯𝐢𝐝𝐞𝐨/𝐠𝐢𝐟* 𝐩𝐚𝐫𝐚 𝐜𝐨𝐧𝐯𝐞𝐫𝐭𝐢𝐫𝐥𝐨 𝐞𝐧 𝐬𝐭𝐢𝐜𝐤𝐞𝐫. 𝐏𝐚𝐫𝐚 𝐬𝐚𝐛𝐞𝐫 𝐥𝐚 𝐥𝐢𝐬𝐭𝐚 𝐝𝐞 𝐞𝐟𝐞𝐜𝐭𝐨𝐬 𝐲 𝐟𝐨𝐫𝐦𝐚𝐬 𝐮𝐬𝐚 *"---𝐢"*
+        text: "💯 𝐑𝐞𝐬𝐩𝐨𝐧𝐝𝐞 𝐚 𝐮𝐧𝐚 *𝐢𝐦𝐚𝐠𝐞𝐧/𝐯𝐢𝐝𝐞𝐨/𝐠𝐢𝐟* 𝐩𝐚𝐫𝐚 𝐜𝐨𝐧𝐯𝐞𝐫𝐭𝐢𝐫𝐥𝐨 𝐞𝐧 𝐬𝐭𝐢𝐜𝐤𝐞𝐫. 𝐏𝐚𝐫𝐚 𝐬𝐚𝐛𝐞𝐫 𝐥𝐚 𝐥𝐢𝐬𝐭𝐚 𝐝𝐞 𝐞𝐟𝐞𝐜𝐭𝐨𝐬 𝐲 𝐟𝐨𝐫𝐦𝐚𝐬 𝐮𝐬𝐚 *---𝐢"
 
 > *B𝐲 𝐁𝐚𝐣𝐨𝐁𝐨𝐭𝐬*.',
         footer: '🎨 Generador automático de stickers',
