@@ -5,7 +5,7 @@ import { webp2png } from '../lib/webp2mp4.js'
 
 let handler = async (m, { conn, args }) => {
   let stiker = false
-  const thumbnailCard = https://files.catbox.moe/qnyttn.jpg' 
+  const thumbnailCard = 'https://files.catbox.moe/qnyttn.jpg' 
 
   try {
     const q = m.quoted ? m.quoted : m
