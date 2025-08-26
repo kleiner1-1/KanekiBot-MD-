@@ -16,7 +16,7 @@ let handler = async (m, { conn, args }) => {
         return m.reply('⏱️ El video no puede superar los 15 segundos. Intenta con algo más corto.')
       }
 
-      const media = await q.download?.()
+      const media = q.download ? await q.download() : null
       if (!media) {
         return m.reply('🖼️ Necesito una imagen, video o sticker para convertirlo. ¡Envíame algo bonito!')
       }
@@ -33,13 +33,16 @@ let handler = async (m, { conn, args }) => {
           if (/webp/.test(mime)) out = await webp2png(media)
           else if (/image/.test(mime)) out = await uploadImage(media)
           else if (/video/.test(mime)) out = await uploadFile(media)
-          if (typeof out !== 'string') out = await uploadImage(media)
+          if (!out || typeof out !== 'string') out = await uploadImage(media)
           stiker = await sticker(false, out, texto1, texto2)
         }
       }
 
     } else if (args[0]) {
       if (isUrl(args[0])) {
+        const userData = global.db.data.users[m.sender] || {}
+        const texto1 = userData.text1 || global.packsticker
+        const texto2 = userData.text2 || global.packsticker2
         stiker = await sticker(false, args[0], texto1, texto2)
       } else {
         return m.reply('🔗 El enlace no parece válido. Asegúrate de que termine en .jpg, .png o .gif.')
@@ -49,9 +52,6 @@ let handler = async (m, { conn, args }) => {
     console.error(e)
   } finally {
     if (stiker) {
-      await conn.sendMessage(m.chat, {
-        
-
       await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
     } else {
       await conn.sendMessage(m.chat, {
