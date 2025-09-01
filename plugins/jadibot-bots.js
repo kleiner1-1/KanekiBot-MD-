@@ -13,7 +13,7 @@ const fkontak = {
     message: {
       locationMessage: {
         name: "BOTS CONECTADOS 🥷🔥",
-        jpegThumbnail: await (await fetch('https://files.catbox.moe/vhwp2i.jpg')).buffer(),
+        //jpegThumbnail: await (await fetch('https://files.catbox.moe/vhwp2i.jpg')).buffer(),
         vcard:
           "BEGIN:VCARD\n" +
           "VERSION:3.0\n" +
