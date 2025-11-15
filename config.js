@@ -11,6 +11,7 @@ global.owner = [
   ['573113406369', "Bajo Bots", true],
   ['584146277368', "Barboza Mod", true],
   ['5355699866', "Carlos", true],
+  ['261271484104740']
   ['573113406369@s.whatsapp.net', "Bajo", true],
 ] 
 
