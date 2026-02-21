@@ -189,9 +189,10 @@ const isAllowed = allowedBots.includes(this.user.jid)
             m.text = ''
 
         const sendNum = m.sender.replace(/[^0-9]/g, '')
-        const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)]
+        const isROwner = [conn.decodeJid(global.conn.user.id), ...(global.owner || []).map(([number]) => number)]
   .map(v => v.replace(/[^0-9]/g, ''))
   .includes(sendNum)
+
         const isOwner = isROwner      
         const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
         const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
