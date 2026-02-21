@@ -24,22 +24,23 @@ let handler = async (m, { conn, text, args }) => {
   await conn.sendFile(m.chat, izumi.image, 'thumbnail.jpg', txt, m)
 
   try {
-    const apiUrl = `https://orbit-oficial.vercel.app/api/download/YTMP3?key=OrbitPlus&url=${encodeURIComponent(izumi.url)}`
+    const videoId = izumi.url.split('v=')[1]?.split('&')[0] || izumi.url.split('/').pop()
+    const apiUrl = `https://nexevo-api.vercel.app/download/y?url=https%3A%2F%2Fyoutube.com%2Fwatch%3Fv%3D${videoId}`
     const response = await fetch(apiUrl)
     const data = await response.json()
 
-    if (data.status !== true || !data.download) {
+    if (data.status !== true || !data.result.url) {
       throw new Error('Fallo al obtener el audio. JSON inesperado')
     }
 
-    const { title, download } = data
+    const { title, url } = data.result
 
     await conn.sendMessage(
       m.chat,
       {
-        audio: { url: download },
+        audio: { url: url },
         mimetype: 'audio/mpeg',
-        fileName: `${title}.mp3`
+        fileName: `${title || izumi.title}.mp3`
       },
       { quoted: m }
     )
