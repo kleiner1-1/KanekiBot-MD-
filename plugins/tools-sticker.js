@@ -5,7 +5,6 @@ import { webp2png } from '../lib/webp2mp4.js'
 
 let handler = async (m, { conn, args }) => {
   let stiker = false
-  const thumbnailCard = 'https://files.catbox.moe/qnyttn.jpg' 
 
   try {
     const q = m.quoted ? m.quoted : m
@@ -55,16 +54,8 @@ let handler = async (m, { conn, args }) => {
       await conn.sendFile(m.chat, stiker, 'sticker.webp', '', m)
     } else {
       await conn.sendMessage(m.chat, {
-        text: "💯 𝐑𝐞𝐬𝐩𝐨𝐧𝐝𝐞 𝐚 𝐮𝐧𝐚 *𝐢𝐦𝐚𝐠𝐞𝐧/𝐯𝐢𝐝𝐞𝐨/𝐠𝐢𝐟* 𝐩𝐚𝐫𝐚 𝐜𝐨𝐧𝐯𝐞𝐫𝐭𝐢𝐫𝐥𝐨 𝐞𝐧 𝐬𝐭𝐢𝐜𝐤𝐞𝐫.\n\n> *By BajoBots*",
-        footer: '🎨 Generador automático de stickers',
-        contextInfo: {
-          externalAdReply: {
-            title: 'No se pudo generar el sticker',
-            body: 'Envíame una imagen o video para convertir',
-            thumbnailUrl: thumbnailCard,
-            sourceUrl: thumbnailCard
-          }
-        }
+        text: "💯 𝐑𝐞𝐬𝐩𝐨𝐧𝐝𝐞 𝐚 𝐮𝐧𝐚 *𝐢𝐦𝐚𝐠𝐞𝐧/𝐯𝐢𝐝𝐞𝐨/𝐠𝐢𝐟* 𝐩𝐚𝐫𝐚 𝐜𝐨𝐧𝐯𝐞𝐫𝐭𝐢𝐫𝐥𝐨 𝐞𝐧 𝐬𝐭𝐢𝐜𝐤𝐞𝐫.",
+        footer: '🎨 Generador automático de stickers'
       }, { quoted: m })
     }
   }
