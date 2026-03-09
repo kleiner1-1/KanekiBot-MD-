@@ -12,20 +12,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
   await conn.groupParticipantsUpdate(m.chat, [user], 'remove')
 
-  let thumbnail = await axios.get('https://qu.ax/VGCPX.jpg', { responseType: 'arraybuffer' })
-
   await conn.sendMessage(m.chat, {
-    text: `✅ Usuario eliminado con éxito`,
-    contextInfo: {
-      externalAdReply: {
-        title: 'KANEKIBOT-MD ⚙️',
-        body: 'BOT OFICIAL • By BajoBots',
-        mediaType: 1,
-        renderLargerThumbnail: true,
-        thumbnail: Buffer.from(thumbnail.data),
-        sourceUrl: 'https://github.com/kleiner1-1'
-      }
-    }
+    text: `✅ Usuario eliminado con éxito`
   }, { quoted: m })
 }
 
