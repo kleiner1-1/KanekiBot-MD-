@@ -15,17 +15,7 @@ let handler = async (m, { conn }) => {
 ╰─💻 *Sistema:*\n${info}`.trim();
 
     await conn.sendMessage(m.chat, {
-      text: texto,
-      contextInfo: {
-        externalAdReply: {
-          title: '📡 Estado del Sistema',
-          body: 'KanekiBot-MD funcionando al 100%',
-          thumbnailUrl: 'https://qu.ax/RkiEC.jpg', // 🖼️ Cambia esta URL por tu miniatura personalizada
-       //   sourceUrl: 'https://github.com/ElChema-Nc/KanekiBot-MD', // 🔗 Opcional
-          mediaType: 1,
-          renderLargerThumbnail: true
-        }
-      }
+      text: texto
     }, { quoted: m });
   });
 };
