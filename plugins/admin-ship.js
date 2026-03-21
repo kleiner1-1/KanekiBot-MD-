@@ -1,30 +1,54 @@
-let handler = async (m, { conn }) => {
+let handler = async (m, { conn, participants }) => {
     try {
         if (!m.isGroup) return m.reply('Solo en grupos')
 
         global.db.data.ship = global.db.data.ship || {}
 
+        let chat = m.chat
         let user1 = m.sender
+        let user2
 
-        // 👇 detectar usuario correctamente
-        let user2 = m.mentionedJid && m.mentionedJid[0]
+        let mention = m.mentionedJid && m.mentionedJid[0]
 
-        // si no menciona, usar el usuario al que responde
-        if (!user2 && m.quoted) user2 = m.quoted.sender
+        // 👉 @me = random
+        if (m.text.includes('@me')) {
+            let users = participants.map(u => u.id)
+                .filter(u => u !== user1)
 
-        if (!user2) return m.reply('Responde a alguien o menciona\nEj: .ship @user')
+            user2 = users[Math.floor(Math.random() * users.length)]
+        }
+
+        // 👉 mención
+        else if (mention) {
+            user2 = mention
+        }
+
+        // 👉 responder
+        else if (m.quoted) {
+            user2 = m.quoted.sender
+        }
+
+        if (!user2) return m.reply('Menciona a alguien, usa @me o responde')
+
+        // evitar repetir misma pareja reciente
+        let last = global.db.data.ship[chat]?.slice(-5) || []
+        let intento = 0
+        while (last.some(x => x.u1 === user1 && x.u2 === user2) && intento < 5) {
+            let users = participants.map(u => u.id).filter(u => u !== user1)
+            user2 = users[Math.floor(Math.random() * users.length)]
+            intento++
+        }
 
         // porcentaje
         let porcentaje = Math.floor(Math.random() * 101)
 
-        let estado = 'No se sabe...'
+        let estado = 'Nada claro'
         if (porcentaje <= 20) estado = 'No combinan mucho'
-        else if (porcentaje <= 50) estado = 'Puede funcionar'
-        else if (porcentaje <= 80) estado = 'Van bien'
+        else if (porcentaje <= 50) estado = 'Puede que sí'
+        else if (porcentaje <= 80) estado = 'Se ven bien'
         else estado = 'Muy buena pareja'
 
         // guardar historial
-        let chat = m.chat
         if (!global.db.data.ship[chat]) global.db.data.ship[chat] = []
 
         global.db.data.ship[chat].push({
@@ -33,14 +57,28 @@ let handler = async (m, { conn }) => {
             p: porcentaje
         })
 
-        // limitar
-        global.db.data.ship[chat] = global.db.data.ship[chat].slice(-10)
+        global.db.data.ship[chat] = global.db.data.ship[chat].slice(-15)
 
-        let txt = `@${user1.split('@')[0]} ❤️ @${user2.split('@')[0]}\n`
-        txt += `Compatibilidad: ${porcentaje}%\n${estado}`
+        // 💍 pareja oficial
+        if (!global.db.data.shipCouple) global.db.data.shipCouple = {}
+
+        let parejaOficial = ''
+        if (porcentaje >= 90) {
+            global.db.data.shipCouple[chat] = { u1: user1, u2: user2 }
+            parejaOficial = '\n💍 Ahora son la pareja del grupo'
+        }
+
+        // 🖼️ imagen discreta
+        let img = `https://api.popcat.xyz/ship?user1=${user1.split('@')[0]}&user2=${user2.split('@')[0]}`
+
+        let txt = `💘 *Match*\n\n`
+        txt += `@${user1.split('@')[0]} × @${user2.split('@')[0]}\n\n`
+        txt += `• Compatibilidad: *${porcentaje}%*\n`
+        txt += `• ${estado}${parejaOficial}`
 
         await conn.sendMessage(m.chat, {
-            text: txt,
+            image: { url: img },
+            caption: txt,
             mentions: [user1, user2]
         }, { quoted: m })
 
