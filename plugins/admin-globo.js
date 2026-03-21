@@ -27,13 +27,14 @@ let handler = async (m, { conn }) => {
         // 🎯 generar globo
         let api = `https://some-random-api.com/canvas/speechbubble?avatar=${encodeURIComponent(url)}`
 
-        // 📥 descargar resultado
         let res = await fetch(api)
         let buffer = await res.buffer()
 
-        await conn.sendMessage(m.chat, {
-            sticker: buffer
-        }, { quoted: m })
+        // ✅ convertir correctamente a sticker
+        await conn.sendImageAsSticker(m.chat, buffer, m, {
+            packname: 'Bot',
+            author: 'Globo'
+        })
 
     } catch (e) {
         console.log(e)
