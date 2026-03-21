@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import FormData from 'form-data'
 
 let handler = async (m, { conn }) => {
     try {
@@ -11,14 +12,23 @@ let handler = async (m, { conn }) => {
 
         let media = await q.download()
 
-        let res = await fetch('https://api.popcat.xyz/speechbubble', {
+        // 📤 subir imagen
+        let form = new FormData()
+        form.append('file', media, 'image.jpg')
+
+        let upload = await fetch('https://telegra.ph/upload', {
             method: 'POST',
-            body: media,
-            headers: {
-                'Content-Type': 'application/octet-stream'
-            }
+            body: form
         })
 
+        let data = await upload.json()
+        let url = 'https://telegra.ph' + data[0].src
+
+        // 🎯 generar globo
+        let api = `https://some-random-api.com/canvas/speechbubble?avatar=${encodeURIComponent(url)}`
+
+        // 📥 descargar resultado
+        let res = await fetch(api)
         let buffer = await res.buffer()
 
         await conn.sendMessage(m.chat, {
@@ -27,7 +37,7 @@ let handler = async (m, { conn }) => {
 
     } catch (e) {
         console.log(e)
-        m.reply('Error al crear el globo')
+        m.reply('Error al crear el sticker')
     }
 }
 
