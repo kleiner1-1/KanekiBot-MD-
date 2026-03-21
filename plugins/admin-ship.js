@@ -30,7 +30,7 @@ let handler = async (m, { conn, participants }) => {
 
         if (!user2) return m.reply('Menciona a alguien, usa @me o responde')
 
-        // evitar repetir misma pareja reciente
+        // evitar repetir
         let last = global.db.data.ship[chat]?.slice(-5) || []
         let intento = 0
         while (last.some(x => x.u1 === user1 && x.u2 === user2) && intento < 5) {
@@ -68,17 +68,14 @@ let handler = async (m, { conn, participants }) => {
             parejaOficial = '\n💍 Ahora son la pareja del grupo'
         }
 
-        // 🖼️ imagen discreta
-        let img = `https://api.popcat.xyz/ship?user1=${user1.split('@')[0]}&user2=${user2.split('@')[0]}`
-
+        // 💬 mensaje
         let txt = `💘 *Match*\n\n`
         txt += `@${user1.split('@')[0]} × @${user2.split('@')[0]}\n\n`
         txt += `• Compatibilidad: *${porcentaje}%*\n`
         txt += `• ${estado}${parejaOficial}`
 
         await conn.sendMessage(m.chat, {
-            image: { url: img },
-            caption: txt,
+            text: txt,
             mentions: [user1, user2]
         }, { quoted: m })
 
