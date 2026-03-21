@@ -1,8 +1,16 @@
-let handler = async (m, { conn, text, participants}) => {
+let handler = async (m, { conn, participants }) => {
+    if (!m.quoted) throw '✳️ Responde a un mensaje.'
+
     let users = participants.map(u => u.id).filter(v => v !== conn.user.jid)
-    if (!m.quoted) throw `✳️ Responde a un mensaje.`
-    conn.sendMessage(m.chat, { forward: m.quoted.fakeObj, mentions: users } )
+
+    await conn.sendMessage(m.chat, {
+        text: m.quoted.text || '📢 Mensaje',
+        mentions: users
+    }, {
+        quoted: m.quoted
+    })
 }
+
 handler.help = ['totag']
 handler.tags = ['group']
 handler.command = /^(totag|tag)$/i
