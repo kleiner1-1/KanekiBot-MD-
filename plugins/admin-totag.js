@@ -1,19 +1,31 @@
-let handler = async (m, { conn, participants }) => {
-    if (!m.quoted) throw '✳️ Responde a un mensaje.'
+let handler = async (m, { conn, text, participants }) => {
+    if (!m.isGroup) throw '❌ Este comando es solo para grupos'
 
-    let users = participants.map(u => u.id).filter(v => v !== conn.user.jid)
+    let users = participants.map(u => u.id)
 
-    await conn.sendMessage(m.chat, {
-        text: m.quoted.text || '📢 Mensaje',
-        mentions: users
-    }, {
-        quoted: m.quoted
-    })
+    // 📌 Caso 1: Si responde a una imagen
+    if (m.quoted && (m.quoted.mtype === 'imageMessage' || m.quoted.mtype === 'videoMessage')) {
+        let media = await m.quoted.download()
+
+        await conn.sendMessage(m.chat, {
+            image: media, // cambia a video: media si quieres soportar video
+            caption: `📢 *NOTIFICACIÓN GENERAL*\n\n${text || 'Mensaje para todos'}\n\n👥 Etiquetando a todos...`,
+            mentions: users
+        }, { quoted: m })
+
+    } 
+    // 📌 Caso 2: Solo texto
+    else {
+        await conn.sendMessage(m.chat, {
+            text: `📢 *NOTIFICACIÓN GENERAL*\n\n${text || 'Mensaje para todos'}\n\n👥 Etiquetando a todos...`,
+            mentions: users
+        }, { quoted: m })
+    }
 }
 
-handler.help = ['totag']
+handler.help = ['notify <mensaje>']
 handler.tags = ['group']
-handler.command = /^(totag|tag)$/i
+handler.command = /^(notify|notificar|n)$/i
 handler.admin = true
 handler.group = true
 
