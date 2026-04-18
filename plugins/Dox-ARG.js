@@ -1,74 +1,68 @@
-const https = require('https');
+import axios from 'axios'
 
-function consultarClientePorDNI(dni, callback) {
-    const url = `https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/${dni}`;
-    
-    https.get(url, (res) => {
-        let data = '';
-        
-        res.on('data', (chunk) => {
-            data += chunk;
-        });
-        
-        res.on('end', () => {
-            try {
-                const jsonData = JSON.parse(data);
-                callback(null, jsonData);
-            } catch (error) {
-                callback(error, null);
-            }
-        });
-    }).on('error', (error) => {
-        callback(error, null);
-    });
-}
+let handler = async (m, { conn, args, usedPrefix, command }) => {
 
-// Función para manejar mensajes de WhatsApp
-function handleWhatsAppMessage(message, replyCallback) {
-    // Verificar si el mensaje contiene el comando .dni
-    if (message.toLowerCase().startsWith('.dni ')) {
-        const dni = message.substring(5).trim();
-        
-        if (!dni) {
-            replyCallback("Por favor, proporciona un número de DNI después del comando .dni");
-            return;
-        }
-        
-        // Indicar que se está procesando la solicitud
-        replyCallback("Consultando información del DNI " + dni + ". Por favor, espera...");
-        
-        consultarClientePorDNI(dni, (error, data) => {
-            if (error) {
-                replyCallback("Error al consultar la información: " + error.message);
-                return;
-            }
-            
-            // Formatear la respuesta para WhatsApp
-            let respuesta = "📋 *Información del cliente*\n\n";
-            
-            // Agregar los campos relevantes de la respuesta
-            if (data.nombre) respuesta += `👤 *Nombre:* ${data.nombre}\n`;
-            if (data.apellido) respuesta += `👤 *Apellido:* ${data.apellido}\n`;
-            if (data.dni) respuesta += `🆔 *DNI:* ${data.dni}\n`;
-            if (data.estado) respuesta += `📊 *Estado:* ${data.estado}\n`;
-            
-            // Agregar otros campos según la estructura de la respuesta
-            // Puedes personalizar esto según lo que devuelva la API
-            
-            replyCallback(respuesta);
-        });
-    } else {
-        // Respuesta por defecto si no es un comando reconocido
-        replyCallback("Hola! Usa el comando .dni seguido de tu número de DNI para consultar tu información. Ejemplo: .dni 95157070");
+  // Validar entrada
+  if (!args[0]) {
+    return conn.reply(m.chat, `❌ *Uso incorrecto*
+
+📌 Ejemplo:
+${usedPrefix + command} 95157070`, m)
+  }
+
+  let dni = args[0]
+
+  // Validar que sea numérico
+  if (!/^\d+$/.test(dni)) {
+    return conn.reply(m.chat, '❌ El DNI debe contener solo números.', m)
+  }
+
+  try {
+    await conn.reply(m.chat, '⏳ *Consultando datos...*', m)
+
+    const url = `https://clientes.credicuotas.com.ar/v1/onboarding/resolvecustomers/${dni}`
+    const { data } = await axios.get(url)
+
+    if (!data || Object.keys(data).length === 0) {
+      return conn.reply(m.chat, `❌ No se encontró información para el DNI: ${dni}`, m)
     }
+
+    let txt = `╭━〔 🔍 *CONSULTA DNI* 〕━⬣
+┃ 👤 *Nombre:* ${data.nombre || 'No disponible'}
+┃ 👤 *Apellido:* ${data.apellido || 'No disponible'}
+┃ 🆔 *DNI:* ${data.dni || dni}
+┃ 📧 *Email:* ${data.email || 'No disponible'}
+┃ 📱 *Teléfono:* ${data.telefono || 'No disponible'}
+┃ 📊 *Estado:* ${data.estado || 'No disponible'}
+╰━━━━━━━━━━━━⬣`
+
+    // Mostrar campos extra automáticamente
+    for (let key in data) {
+      if (!['nombre','apellido','dni','email','telefono','estado'].includes(key)) {
+        txt += `\n┃ 🔹 *${key}:* ${data[key]}`
+      }
+    }
+
+    await conn.reply(m.chat, txt, m)
+
+  } catch (e) {
+    console.error(e)
+
+    if (e.response) {
+      if (e.response.status === 404) {
+        return conn.reply(m.chat, `❌ DNI no encontrado`, m)
+      } else {
+        return conn.reply(m.chat, `❌ Error del servidor (${e.response.status})`, m)
+      }
+    } else {
+      return conn.reply(m.chat, '❌ Error al conectar con la API', m)
+    }
+  }
 }
 
-// Ejemplo de cómo integrar con tu bot de WhatsApp
-// Esto dependerá de la librería que estés usando para tu bot
-// Por ejemplo, si usas whatsapp-web.js:
+// Configuración del comando
+handler.help = ['dni <numero>']
+handler.tags = ['tools']
+handler.command = ['dni']
 
-// client.on('message', message => {
-//     handleWhatsAppMessage(message.body, (response) => {
-//         message.reply(response);
-//     });
-// });
+export default handler
