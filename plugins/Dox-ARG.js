@@ -22,41 +22,27 @@ ${usedPrefix + command} 95167877`, m)
 
     let data = res.data;
 
-    // --- INICIO DE LA DEPURACIÓN CLAVE ---
-    // Esta línea imprimirá en la consola de tu bot el objeto exacto que devuelve la API
-    console.log("Respuesta de la API para DNI " + dni + ":", JSON.stringify(data, null, 2));
-    // --- FIN DE LA DEPURACIÓN CLAVE ---
-
+    // La API devuelve un array, tomamos el primer objeto
     if (Array.isArray(data)) {
       if (data.length === 0) {
         return conn.reply(m.chat, `❌ No se encontró información para el DNI: ${dni}`, m);
       }
       data = data[0];
     }
-
-    if (data && typeof data === 'object' && data.data) {
-      if (Array.isArray(data.data)) {
-        if (data.data.length === 0) {
-          return conn.reply(m.chat, `❌ No se encontró información para el DNI: ${dni}`, m);
-        }
-        data = data.data[0];
-      } else {
-        data = data.data;
-      }
+    
+    // Verificamos que el objeto final sea válido
+    if (!data || typeof data !== 'object') {
+      return conn.reply(m.chat, `❌ No se pudo procesar la información del DNI: ${dni}`, m);
     }
 
-    if (!data || typeof data !== 'object' || Array.isArray(data)) {
-      return conn.reply(m.chat, `❌ La API devolvió una estructura de datos inesperada. Revisa la consola para más detalles.`, m);
-    }
-
-    // Ahora, intentamos construir el mensaje, pero si no funciona, ya sabremos por qué gracias al console.log de arriba
+    // --- FORMATEO CORREGIDO ---
+    // Usamos los nombres de propiedad correctos que nos dio la API
     let txt = `╭━〔 🔍 *CONSULTA DNI* 〕━⬣
-┃ 👤 *Nombre:* ${data.nombre || data.firstName || data.name || 'No disponible'}
-┃ 👤 *Apellido:* ${data.apellido || data.lastName || data.surname || 'No disponible'}
-┃ 🆔 *DNI:* ${data.dni || dni}
-┃ 📧 *Email:* ${data.email || data.mail || 'No disponible'}
-┃ 📱 *Teléfono:* ${data.telefono || data.phone || data.celular || 'No disponible'}
-┃ 📊 *Estado:* ${data.estado || data.status || 'No disponible'}
+┃ 👤 *Nombre Completo:* ${data.nombrecompleto || 'No disponible'}
+┃ 🆔 *DNI:* ${data.dni || 'No disponible'}
+┃ 🆔 *CUIT:* ${data.cuit || 'No disponible'}
+┃ 🎂 *Fecha de Nacimiento:* ${data.fechanacimiento || 'No disponible'}
+┃ ⚤ *Sexo:* ${data.sexo === 'M' ? 'Masculino' : data.sexo === 'F' ? 'Femenino' : data.sexo || 'No disponible'}
 ╰━━━━━━━━━━━━⬣`
 
     await conn.reply(m.chat, txt, m);
