@@ -25,7 +25,7 @@ let handler = async (m, { conn, text, args }) => {
 
   try {
     const videoId = izumi.url.split('v=')[1]?.split('&')[0] || izumi.url.split('/').pop()
-    const apiUrl = `https://nex-magical.vercel.app/download/y?url=https%3A%2F%2Fyoutube.com%2Fwatch%3Fv%3D${videoId}`
+    const apiUrl = `https://nex-magical.vercel.app/download/y?url=https%3A%2F%2Fyoutube.com%2Fwatch%3Fv%3D${videoId}&apikey=NEX-Magicalofc`
     const response = await fetch(apiUrl)
     const data = await response.json()
 
