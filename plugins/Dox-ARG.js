@@ -24,18 +24,23 @@ function consultarClientePorDNI(dni, callback) {
 }
 
 // Función para manejar mensajes de WhatsApp
-function handleWhatsAppMessage(message) {
+function handleWhatsAppMessage(message, replyCallback) {
     // Verificar si el mensaje contiene el comando .dni
     if (message.toLowerCase().startsWith('.dni ')) {
         const dni = message.substring(5).trim();
         
         if (!dni) {
-            return "Por favor, proporciona un número de DNI después del comando .dni";
+            replyCallback("Por favor, proporciona un número de DNI después del comando .dni");
+            return;
         }
+        
+        // Indicar que se está procesando la solicitud
+        replyCallback("Consultando información del DNI " + dni + ". Por favor, espera...");
         
         consultarClientePorDNI(dni, (error, data) => {
             if (error) {
-                return "Error al consultar la información: " + error.message;
+                replyCallback("Error al consultar la información: " + error.message);
+                return;
             }
             
             // Formatear la respuesta para WhatsApp
@@ -50,12 +55,12 @@ function handleWhatsAppMessage(message) {
             // Agregar otros campos según la estructura de la respuesta
             // Puedes personalizar esto según lo que devuelva la API
             
-            return respuesta;
+            replyCallback(respuesta);
         });
+    } else {
+        // Respuesta por defecto si no es un comando reconocido
+        replyCallback("Hola! Usa el comando .dni seguido de tu número de DNI para consultar tu información. Ejemplo: .dni 95157070");
     }
-    
-    // Respuesta por defecto si no es un comando reconocido
-    return "Hola! Usa el comando .dni seguido de tu número de DNI para consultar tu información. Ejemplo: .dni 95157070";
 }
 
 // Ejemplo de cómo integrar con tu bot de WhatsApp
@@ -63,8 +68,7 @@ function handleWhatsAppMessage(message) {
 // Por ejemplo, si usas whatsapp-web.js:
 
 // client.on('message', message => {
-//     if (message.body.startsWith('.dni')) {
-//         const response = handleWhatsAppMessage(message.body);
+//     handleWhatsAppMessage(message.body, (response) => {
 //         message.reply(response);
-//     }
+//     });
 // });
