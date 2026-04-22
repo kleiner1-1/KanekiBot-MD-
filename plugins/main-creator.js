@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import PhoneNumber from 'awesome-phonenumber';
 
 async function handler(m, { conn }) {
-  const numcreador = '573113406369';
+  const numcreador = '573505355555';
   const ownerJid = numcreador + '@s.whatsapp.net';
 
   const name = await conn.getName(ownerJid) || 'Owner';
@@ -11,8 +11,8 @@ async function handler(m, { conn }) {
     'Creador de bots de WhatsApp y del Bot Meliodas MD';
   const empresa = 'Bajo Bots - Servicios Tecnológicos';
   const imagen = 'https://qu.ax/VGCPX.jpg';
-  const correo = 'kleinergalindo4@gmail.com';
-  const instagram = 'https://instagram.com/kleinercg';
+  const correo = '';
+  const instagram = '';
 
   const caption = `
 ╭══ 🎭 *KANEKI BOT OWNER* ══⬣
