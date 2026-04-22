@@ -30,19 +30,38 @@ ${usedPrefix + command} 1041693639`, m)
     let html = res.data
     const $ = load(html)
     
-    // Extraer datos del HTML
+    // Primero, vamos a ver si hay un JSON incrustado en el HTML
+    let jsonData = null
+    $('script').each(function() {
+      const scriptContent = $(this).html()
+      if (scriptContent && scriptContent.includes('data') || scriptContent.includes('result')) {
+        try {
+          // Intentar extraer JSON del script
+          const jsonMatch = scriptContent.match(/\{[\s\S]*\}/)
+          if (jsonMatch) {
+            jsonData = JSON.parse(jsonMatch[0])
+            return false // Salir del bucle si encontramos JSON
+          }
+        } catch (e) {
+          // Ignorar errores de parsing
+        }
+      }
+    })
+    
     let result = {}
     
-    // Buscar información en diferentes formatos posibles
-    $('.result, .info, .data, table tr, div, p').each(function() {
-      const text = $(this).text().trim()
+    // Si encontramos JSON, usarlo
+    if (jsonData) {
+      result = jsonData
+    } else {
+      // Si no, intentar extraer datos del HTML de diferentes maneras
       
-      // Intentar extraer pares clave:valor
-      if (text.includes(':')) {
-        const parts = text.split(':')
-        if (parts.length >= 2) {
-          const key = parts[0].trim().toLowerCase()
-          const value = parts.slice(1).join(':').trim()
+      // Método 1: Buscar en tablas
+      $('table tr').each(function() {
+        const cells = $(this).find('td, th')
+        if (cells.length >= 2) {
+          const key = cells.eq(0).text().trim().toLowerCase()
+          const value = cells.eq(1).text().trim()
           
           if (key.includes('documento') || key.includes('cedula')) {
             result.numero_documento = value
@@ -62,33 +81,61 @@ ${usedPrefix + command} 1041693639`, m)
             result.ficha = value
           }
         }
-      }
-    })
-    
-    // Si no se encontraron datos con el método anterior, intentar con regex
-    if (Object.keys(result).length === 0) {
-      const htmlText = html.replace(/\s+/g, ' ')
+      })
       
-      // Patrones comunes para extraer información
-      const patterns = {
-        numero_documento: /(?:documento|cedula|número|numero)[\s:]+(\d+)/i,
-        tipo_documento: /(?:tipo)[\s:]+([^\s\n]+)/i,
-        nombres: /(?:nombre|nombres)[\s:]+([^\s\n]+)/i,
-        apellidos: /(?:apellido|apellidos)[\s:]+([^\s\n]+)/i,
-        municipio: /(?:municipio)[\s:]+([^\s\n]+)/i,
-        departamento: /(?:departamento)[\s:]+([^\s\n]+)/i,
-        fecha_consulta: /(?:fecha|consulta)[\s:]+([^\s\n]+)/i,
-        ficha: /(?:ficha)[\s:]+([^\s\n]+)/i
+      // Método 2: Buscar en divs con clases comunes
+      if (Object.keys(result).length === 0) {
+        $('.result, .info, .data, .card, .panel').each(function() {
+          const text = $(this).text()
+          
+          // Patrones para extraer información
+          const patterns = {
+            numero_documento: /(?:documento|cedula|número|numero)[\s:]+(\d+)/i,
+            tipo_documento: /(?:tipo)[\s:]+([^\s\n]+)/i,
+            nombres: /(?:nombre|nombres)[\s:]+([^\s\n]+)/i,
+            apellidos: /(?:apellido|apellidos)[\s:]+([^\s\n]+)/i,
+            municipio: /(?:municipio)[\s:]+([^\s\n]+)/i,
+            departamento: /(?:departamento)[\s:]+([^\s\n]+)/i,
+            fecha_consulta: /(?:fecha|consulta)[\s:]+([^\s\n]+)/i,
+            ficha: /(?:ficha)[\s:]+([^\s\n]+)/i
+          }
+          
+          for (const [key, pattern] of Object.entries(patterns)) {
+            if (!result[key]) {
+              const match = text.match(pattern)
+              if (match) result[key] = match[1]
+            }
+          }
+        })
       }
       
-      for (const [key, pattern] of Object.entries(patterns)) {
-        const match = htmlText.match(pattern)
-        if (match) result[key] = match[1]
+      // Método 3: Buscar en todo el HTML
+      if (Object.keys(result).length === 0) {
+        const htmlText = html.replace(/\s+/g, ' ')
+        
+        const patterns = {
+          numero_documento: /(?:documento|cedula|número|numero)[\s:]+(\d+)/i,
+          tipo_documento: /(?:tipo)[\s:]+([^\s\n]+)/i,
+          nombres: /(?:nombre|nombres)[\s:]+([^\s\n]+)/i,
+          apellidos: /(?:apellido|apellidos)[\s:]+([^\s\n]+)/i,
+          municipio: /(?:municipio)[\s:]+([^\s\n]+)/i,
+          departamento: /(?:departamento)[\s:]+([^\s\n]+)/i,
+          fecha_consulta: /(?:fecha|consulta)[\s:]+([^\s\n]+)/i,
+          ficha: /(?:ficha)[\s:]+([^\s\n]+)/i
+        }
+        
+        for (const [key, pattern] of Object.entries(patterns)) {
+          const match = htmlText.match(pattern)
+          if (match) result[key] = match[1]
+        }
       }
     }
 
     if (Object.keys(result).length === 0) {
-      return conn.reply(m.chat, '❌ No se encontró información en la respuesta de la API', m)
+      // Para depuración: mostrar parte del HTML recibido
+      const preview = html.substring(0, 500)
+      console.log('Preview del HTML recibido:', preview)
+      return conn.reply(m.chat, '❌ No se encontró información en la respuesta de la API. La estructura puede haber cambiado.', m)
     }
 
     // LIMPIAR TEXTO
