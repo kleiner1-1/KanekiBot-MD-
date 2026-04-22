@@ -13,57 +13,57 @@ ${usedPrefix + command} 1041693639`, m)
     return conn.reply(m.chat, '❌ Solo números.', m)
   }
 
-  try {
-    await conn.reply(m.chat, '⏳ Consultando...', m)
+  await conn.reply(m.chat, '⏳ Consultando...', m)
 
+  try {
     const url = `https://colombia.hackpurgatory.org/colombia?cedula=${cedula}`
 
     const res = await axios.get(url, {
+      timeout: 10000,
       headers: {
         'User-Agent': 'Mozilla/5.0',
-        'Accept': 'application/json,text/plain,*/*'
       }
     })
 
     let data = res.data
 
-    // 🔥 Si viene HTML → intentar extraer JSON
-    if (typeof data === 'string') {
-      let match = data.match(/\{[\s\S]*\}/)
-      if (match) {
-        data = JSON.parse(match[0])
-      } else {
-        return conn.reply(m.chat, '❌ No se pudo obtener datos (bloqueo o HTML)', m)
-      }
+    // Si no es JSON válido → fallback
+    if (typeof data !== 'object') {
+      throw new Error('Bloqueado')
     }
 
-    if (!data) {
-      return conn.reply(m.chat, '❌ Sin resultados', m)
-    }
-
-    // limpiar
     const clean = (t) => t ? t.replace(/\s+/g, ' ').trim() : 'No disponible'
 
     let txt = `📋 *Consulta Colombia*
 
-🆔 Documento: ${data.numero_documento || cedula}
-👤 Nombre: ${clean(data.nombres || data.nombre)}
-👤 Apellido: ${clean(data.apellidos || data.apellido)}
-📍 Municipio: ${data.municipio || 'No disponible'}
-🗺️ Departamento: ${data.departamento || 'No disponible'}
-📅 Fecha: ${data.fecha_consulta || 'No disponible'}
+🆔 ${data.numero_documento || cedula}
+👤 ${clean(data.nombres)}
+👤 ${clean(data.apellidos)}
+📍 ${data.municipio || 'No disponible'}
+🗺️ ${data.departamento || 'No disponible'}
 `
 
     await conn.reply(m.chat, txt, m)
 
   } catch (e) {
-    console.error(e)
-    await conn.reply(m.chat, '❌ Error (la web bloqueó la petición)', m)
+
+    // 🔥 RESPUESTA REALISTA
+    await conn.reply(m.chat, `❌ No se pudo obtener información
+
+⚠️ La página está protegida y bloquea bots.
+
+💡 Opciones reales:
+• Usar navegador manual
+• Usar API privada
+• Usar sistema scraping avanzado
+
+Si quieres algo que sí funcione siempre,
+dime: *modo sistema real*`, m)
   }
 }
 
-handler.help = ['cedula2 <numero>']
+handler.help = ['cedula <numero>']
 handler.tags = ['tools']
-handler.command = ['cedula2']
+handler.command = ['cedula']
 
 export default handler
