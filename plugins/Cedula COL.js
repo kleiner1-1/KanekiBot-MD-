@@ -4,49 +4,82 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
 
   if (!args[0]) {
     return conn.reply(m.chat, `❌ *Uso incorrecto*
-
-📌 Ejemplo:
-${usedPrefix + command} 1041693729`, m)
+Ejemplo:
+${usedPrefix + command} 1041693639`, m)
   }
 
   let cedula = args[0]
 
   if (!/^\d+$/.test(cedula)) {
-    return conn.reply(m.chat, '❌ La cédula debe contener solo números.', m)
+    return conn.reply(m.chat, '❌ La cédula debe ser numérica.', m)
   }
 
   try {
-    await conn.reply(m.chat, '⏳ *Consultando base de datos Colombia...*', m)
+    await conn.reply(m.chat, '⏳ *Consultando base de datos...*', m)
 
     const url = `https://hackpurgatory.org/tools/colombiaid.html?search=${cedula}`
-    const { data } = await axios.get(url)
 
-    if (!data || !data.success) {
-      return conn.reply(m.chat, '❌ No se encontró información', m)
-    }
+    const res = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
+      }
+    })
 
-    // 🔥 LIMPIAR TEXTO (QUITAR \r\n y espacios raros)
-    const limpiar = (txt) => txt ? txt.replace(/\s+/g, ' ').trim() : 'No disponible'
+    let data = res.data
 
-    let nombres = limpiar(data.nombres)
-    let apellidos = limpiar(data.apellidos)
+    // 🔥 CASO 1: VIENE JSON (ideal)
+    if (typeof data === 'object' && data.success) {
 
-    let txt = `╭━〔 🇨🇴 *CONSULTA CÉDULA* 〕━⬣
+      const limpiar = (txt) => txt ? txt.replace(/\s+/g, ' ').trim() : 'No disponible'
+
+      let txt = `╭━〔 🇨🇴 *CONSULTA CÉDULA* 〕━⬣
 ┃ 🆔 *Documento:* ${data.numero_documento}
 ┃ 📄 *Tipo:* ${data.tipo_documento}
-┃ 👤 *Nombres:* ${nombres}
-┃ 👤 *Apellidos:* ${apellidos}
+┃ 👤 *Nombres:* ${limpiar(data.nombres)}
+┃ 👤 *Apellidos:* ${limpiar(data.apellidos)}
 ┃ 📍 *Municipio:* ${data.municipio}
 ┃ 🗺️ *Departamento:* ${data.departamento}
-┃ 📅 *Consulta:* ${data.fecha_consulta}
-┃ 🔎 *Ficha:* ${data.ficha}
 ╰━━━━━━━━━━━━⬣`
 
-    await conn.reply(m.chat, txt, m)
+      return conn.reply(m.chat, txt, m)
+    }
+
+    // 🔥 CASO 2: VIENE HTML (LO NORMAL)
+    if (typeof data === 'string') {
+
+      // Extraer datos con regex
+      const get = (regex) => {
+        let match = data.match(regex)
+        return match ? match[1].trim() : 'No disponible'
+      }
+
+      let nombres = get(/Nombres:\s*<\/b>\s*([^<]+)/i)
+      let apellidos = get(/Apellidos:\s*<\/b>\s*([^<]+)/i)
+      let documento = get(/Número de documento:\s*<\/b>\s*([^<]+)/i)
+      let municipio = get(/Municipio:\s*<\/b>\s*([^<]+)/i)
+      let departamento = get(/Departamento:\s*<\/b>\s*([^<]+)/i)
+
+      // Si no encontró nada real
+      if (nombres === 'No disponible' && apellidos === 'No disponible') {
+        return conn.reply(m.chat, '❌ No se encontró información válida', m)
+      }
+
+      let txt = `╭━〔 🇨🇴 *CONSULTA CÉDULA* 〕━⬣
+┃ 🆔 *Documento:* ${documento}
+┃ 👤 *Nombres:* ${nombres}
+┃ 👤 *Apellidos:* ${apellidos}
+┃ 📍 *Municipio:* ${municipio}
+┃ 🗺️ *Departamento:* ${departamento}
+╰━━━━━━━━━━━━⬣`
+
+      return conn.reply(m.chat, txt, m)
+    }
+
+    return conn.reply(m.chat, '❌ No se pudo interpretar la respuesta', m)
 
   } catch (e) {
     console.error(e)
-    await conn.reply(m.chat, '❌ Error al conectar con la API', m)
+    return conn.reply(m.chat, '❌ Error al consultar la API', m)
   }
 }
 
