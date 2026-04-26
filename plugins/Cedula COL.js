@@ -3,36 +3,55 @@ import fetch from "node-fetch"
 let handler = async (m, { conn, text }) => {
 
   if (!text) {
-    return m.reply(`❌ Ejemplo de uso:\n.argdox Juan Garcia`)
+    return m.reply(`❌ Uso:\n.argdox Juan Garcia`)
   }
 
   try {
-    // convertir espacios a +
-    let query = text.trim().replace(/ +/g, "+")
+    let query = encodeURIComponent(text)
 
     let url = `https://api.mitzuki.xyz/dox/argentina?q=${query}&apikey=sk-7b04038cd4d9dd8bb44d55e2b8cc9d0b9213089c17dce2fd0555c012e0fd0f10`
 
-    let res = await fetch(url)
+    let res = await fetch(url, {
+      headers: {
+        "accept": "application/json",
+        "user-agent": "Mozilla/5.0"
+      }
+    })
+
     let json = await res.json()
 
-    if (!json || !json.result || json.result.length === 0) {
+    // ✅ usar data real
+    let results = json.data
+
+    if (!results || results.length === 0) {
       return m.reply("❌ No se encontraron resultados")
     }
 
-    let teks = `╭━━〔 🔍 ARG DOX 〕━━⬣\n`
-    
-    json.result.slice(0, 5).forEach((data, i) => {
+    let teks = `╭━━〔 🔍 ARG BUSQUEDA 〕━━⬣
+┃ 🔎 Consulta: ${text}
+┃ 📊 Resultados: ${results.length}
+┣━━━━━━━━━━━━━━⬣`
+
+    results.slice(0, 5).forEach((v, i) => {
+
+      // 📍 domicilio principal
+      let direccion = v.domicilios?.[0]?.domicilio || "No disponible"
+
+      // 📞 telefono
+      let telefono = v.telefonos?.[0] || "No disponible"
+
       teks += `
 ┣⪼ 📌 Resultado ${i + 1}
-┃ 👤 Nombre: ${data.nombre || "No disponible"}
-┃ 🆔 DNI: ${data.dni || "No disponible"}
-┃ 📍 Dirección: ${data.direccion || "No disponible"}
-┃ 🌎 Provincia: ${data.provincia || "No disponible"}
-┃ 📞 Teléfono: ${data.telefono || "No disponible"}
-`
+┃ 👤 Nombre: ${v.nombre_completo || "N/A"}
+┃ 🆔 DNI: ${v.dni || "N/A"}
+┃ 🎂 Nacimiento: ${v.fecha_nacimiento || "N/A"}
+┃ 📍 Dirección: ${direccion}
+┃ 🌎 Provincia: ${v.provincia || "N/A"}
+┃ 📞 Teléfono: ${telefono}
+┣━━━━━━━━━━━━━━⬣`
     })
 
-    teks += `╰━━━━━━━━━━━━⬣`
+    teks += `\n╰━━━━━━━━━━━━━━⬣`
 
     await conn.sendMessage(m.chat, {
       text: teks
