@@ -36,7 +36,7 @@ let handler = async (m, { conn, text }) => {
     let mensaje = `
 ╭━━━〔 🩸 KANEKI • DATA SCAN 〕━━━⬣
 ┃ 🧬 Estado: ✔️ Conectado
-┃ 📡 Fuente: Mitzuki API
+┃ 📡 Fuente: Estivxn 
 ╰━━━━━━━━━━━━━━━━━━⬣
 
 ╭─❖ 「 👤 IDENTIDAD 」 ❖─╮
@@ -63,10 +63,8 @@ ${telefonos}
 ┃ ✧ ID Persona: ${u.idpersona}
 ╰━━━━━━━━━━━━━━━━━━⬣
 
-> 🩸 KanekiBot • Sistema de Inteligencia
-> ⚡ Respuesta generada automáticamente
-`
 
+`
     await conn.sendMessage(m.chat, { text: mensaje }, { quoted: m })
 
   } catch (e) {
