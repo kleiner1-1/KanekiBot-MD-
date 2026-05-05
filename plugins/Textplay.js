@@ -35,7 +35,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
 
         const { title, author, image, download } = json.data
 
-        let info = `📌 *${title}*\n👤 *${author}*\n⏱️ *${duration}*\n📦 *${isVideo ? 'MP4' : 'MP3'}*\n\n*By: Barboza Developer*`
+        let info = `📌 *${title}*\n👤 *${author}*\n⏱️ *${duration}*\n📦 *${isVideo ? 'MP4' : 'MP3'}*\n\n*By: Kaneki Costeño*`
 
         if (isVideo) {
             await conn.sendMessage(m.chat, { 
